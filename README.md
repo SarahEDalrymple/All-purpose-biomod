@@ -1,4 +1,4 @@
-To find one extremely annotated R script presenting biomod with all the necessary downloads and data prep, go to the Github link above.
+To find one highly annotated R script presenting biomod with all the necessary downloads and data prep, go to the Github link above.
 
 Pull requests and revisions/adaptations welcome.
 
