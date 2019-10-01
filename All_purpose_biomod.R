@@ -1,9 +1,10 @@
 # DESCRIPTION
 # Species Distribution Modeling with biomod2.
+# Melampyrum pratense
 # analysis aims to use occurence records to generate projections of climate niche,
 # uses current and future climate projections to calculate species range change
 
-# adapted and compiled by Joe Bellis and Sarah Dalrymple
+# adapted by Sarah Dalrymple
 # for sources, see end of script
 
 # Script written in R version 3.5.1 (2018-07-02) -- "Feather Spray"
@@ -11,21 +12,12 @@
 
 
 # Notes on use of script:
-# Analysis is given in sequence but script presents alternatives that can be used as needed
-# i.e. steps 1.1 and 1.2 are alternatives, not sequential steps.
-# Script should be adapted for different species, geographic areas and climate projections but,
-# save the script with an appropriate file name and do not change this master version.
-# it is recommended that you delete the parts of the code you do not need to avoid errors
+# Adapted from 'All_purpose_biomod', most annotations and alternative pathways removed.
+# Only those needed to generate Mel_pratense outputs retained.
 
 
 ### Step 0: preparing R for your analysis
 #########################################
-
-#?# not sure which of the following libraries are actually needed in the code that follows
-# load libraries needed for analysis
-# if not yet installed, R will return an error message in the console,
-# use install.packages() inserting the name of the package in quotation marks in the brackets,
-# and then try loading the libraries again
 
 library(ade4)
 library(sp)#
@@ -50,23 +42,12 @@ library(ggmap)
 library(rgbif)#
 
 
-# insert file pathway with setwd() i.e. something like this: setwd("C:\\Users\\Joe\\Documents\\R")
-# *IMPORTANT* if working with various species, it's a good idea to set the 
-# working directory to a specific folder for each species
-
-getwd()
-choose.dir()
 setwd("C:\\Users\\sarah\\Dropbox\\Melampyrum\\Melampyrum_biomod")
 
 ### step 1: read distribution data
 ##################################
 
-# Steps 1.1 and 1.2 below are given as alternatives.
-# step 1.1 is preferred if there are known gaps in GBIF data and you want to add your own
-# or manipulate the GBIF data in some way prior to analysis.
-# step 1.2 is good for multi-species downloads and when there is more confidence in the data.
 
-# 1.1
 # Read species occurrences into R from your own text file
 # to use code below unchanged, your text file should have x,
 # or longitudinal coordinates in the first column,
@@ -126,48 +107,10 @@ plot(inspect_dist_points)
 points(Occ, pch = 46, col = "black")
 dev.off()
 
-# 1.2
-# Getting species data from GBIF using *rgbif* package
-
-spp_Protea <- name_suggest(q='Protea laurifolia', rank='species',limit = 10000)
-(spp_Protea <- spp_Protea[ grepl("^Protea laurifolia$", spp_Protea$canonicalName),])
-
-# Get species occurrences
-
-data <- occ_search(taxonKey = spp_Protea$key, 
-                   country='ZA', 
-                   fields = c('name','key','country','decimalLatitude','decimalLongitude'),  
-                   hasCoordinate=T , 
-                   limit=1000, 
-                   return = 'data')
-# if GBIF returns several matches for the given species name, the above code requires there to be coordinates
-# the code below will either return 'no data found, try a different search' or the data as a table
-# print the summary of the extracted object
-data
-data <- data[['5637308']] 
-
-#remove blank spaces from species names.
-data$name <- sub(" ", ".", data$name)
-(spp_to_model <- unique(data$name))
-
-## Total number of occurrences: 
-sort(table(data$name), decreasing = T)
-
-#?# still need to get this data into data object called 'Occ'
-
 
 #### Step 2:  create raster stack of current climate layers from WorldClim
 ###########################################################################
 
-# options 2.1-2.3 below provide alternative ways of getting the Worldclim climate data into R.
-# options may be chosen based on online connectivity (steps 2.1 and 2.3 require this),
-# or preferences for storing tif files on hard drive - this requires the storage of large files,
-# but can be more convenient if online connectivity is interrupted and/or many models are being run.
-
-# step 2 should generate an object called 'bioclim_world' whichever option is used.
-# for Worldclim citation, see end of script
-
-# 2.1
 # Use the `getData()` function from the 'raster' package to access climate data
 
 # to retreive global current bioclimatic variables at 2.5' resolution
@@ -187,20 +130,6 @@ proj4string(bioclim_world)
 bioclim_world <- projectRaster(bioclim_world, crs=ProjW)
 # and the go back and check the projection again
 
-# 2.2 
-# Use pre-downloaded .tif files from Worldclim available at:
-# http://www.worldclim.org/
-
-# Decisions to be made:resolution of data? For species distribution modelling recommend 2.5' or 5'
-# data is available at 1' but only for current climate and not future projections
-# download data as .tif files from Worldclim version 2 at 5 arcmin (~10km)
-
-# Load bioclim variables
-# You don't have to load all variables if you know some are more ecologically relevant.
-# Example file pathway is given below but you should substitute your own.
-# You don't need to use the whole pathway if you've used setwd() above, just include the filed name.
-# To find your file, use file.choose() function which allows you to navigate to the file needed,
-# the file pathway will appear in the console below, copy it in to replace the existing pathway
 
 # The bioclim variables:
 
@@ -224,59 +153,6 @@ bioclim_world <- projectRaster(bioclim_world, crs=ProjW)
 #BIO18 = Precipitation of Warmest Quarter
 #BIO19 = Precipitation of Coldest Quarter
 
-file.choose()
-
-# Stack the bioclim variables that you want, you don't have to load them all,
-# any combination of rasters can make the stack
-bioclim_world <-stack(c(bio1 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_01.tif"),
-                        bio2 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_02.tif"),
-                        bio3 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_03.tif"),
-                        bio4 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_04.tif"),
-                        bio5 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_05.tif"),
-                        bio6 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_06.tif"),
-                        bio7 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_07.tif"),
-                        bio8 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_08.tif"),
-                        bio9 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_09.tif"),
-                        bio10 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_10.tif"),
-                        bio11 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_11.tif"),
-                        bio12 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_12.tif"),
-                        bio13 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_13.tif"),
-                        bio14 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_14.tif"),
-                        bio15 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_15.tif"),
-                        bio16 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_16.tif"),
-                        bio17 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_17.tif"),
-                        bio18 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_18.tif"),
-                        bio19 = raster("C:\\Users\\Joe\\Documents\\R\\Bioclim_Vars\\1km_res\\wc2.0_bio_30s_19.tif")))
-
-
-bioclim_world #gives summary of object including extent
-plot(bioclim_world) 
-# plot lets you check that they have loaded properly but is not necessary to the analysis
-
-
-# 2.3
-# Get R to do the download for you
-
-# method used in 'Developed case studies', Guisan et al 2017
-
-dir.create("WorldClim_data", showWarnings = F) #creates the last element of the path,
-# i.e. adds this folder to your working directory
-
-## current bioclim
-download.file(url = "http://biogeo.ucdavis.edu/data/climate/worldclim/1_4/grid/cur/bio_10m_esri.zip", 
-              destfile = "WorldClim_data/current_bioclim_10min.zip", 
-              method = "auto")
-# extract files
-unzip( zipfile = "WorldClim_data/current_bioclim_10min.zip", 
-       exdir = "WorldClim_data/current", 
-       overwrite = T)
-list.files("WorldClim_data/current/bio/")
-#?# removed the underscore following "bio... but this might be needed, if so, the future projections stack will probably also need underscores adding
-bioclim_world <- stack(list.files("WorldClim_data/current/bio", 
-                                  pattern ="bio", full.names=T), 
-                       RAT = FALSE)
-
-bioclim_world #gives summary of object including extent
 plot(bioclim_world) 
 # plot lets you check that they have loaded properly but is not necessary to the analysis
 
@@ -289,66 +165,11 @@ plot(bioclim_world)
 # regardless of option, you should generate an object (in this case a raster stack)
 # called 'bioclim_cropped'
 
-# 3.1
 # limit area by longitudinal and latitudinal extent 
 # e.g. for Europe
 ext <- extent(-25, 41, 35, 72)
 bioclim_cropped <- crop(bioclim_world, ext)
 plot(bioclim_cropped) #plots the bioclim variables only for Europe
-
-# 3.2
-# use an existing shapefile to restrict stack
-
-file()
-extshp <- readOGR("D:\\Research project\\golden winged warbler\\North & south america", 
-                  layer = "North_South_America")
-# checks for projections (will be displayed in console I think)
-proj4string(extshp)
-# transform projections if necessary
-bioclim_world <- spTransform(extshp, CRSobj = CRS(proj4string(Occ)))
-
-bioclim_cropped <- crop(bioclim_world, extshp)
-bioclim_cropped <- mask(bioclim_world, extshp)
-
-# 3.3
-# create a shapefile using distribution points to select appropriate global ecoregions 
-# for clipping bioclim variables
-# WWF ecoregions shapefile needs to be downloaded from:
-# https://www.worldwildlife.org/pages/conservation-science-data-and-tools
-# marine, terrestrial or freshwater shapefiles are available
-# citations are given on the respective download webpage
-
-# Load WWF terrestrial ecoregion shapefile 
-geogrextent<-readOGR("C:\\Users\\Joe\\Documents\\R\\wwf_terr_ecos")
-
-ecoreg_sp<-over(Occ,geogrextent) # extract ecoregions of each locality point, 
-# corresponds to distribution mapping inArcGis (select by loc)
-uniqueEcoreg<-as.character(na.omit(unique(ecoreg_sp$ECO_NAME)))# unique list of occupied ecoregions
-occupiedEcoregions<- subset(geogrextent, geogrextent$ECO_NAME %in% uniqueEcoreg)#polygons of occupied ecoregions
-
-# Code for writing shapefiles
-writeOGR(obj = occupiedEcoregions, dsn = "C:\\Users\\Joe\\Documents\\R", layer = "C_picta_OccEcoreg", driver = "ESRI Shapefile")
-
-plot(occupiedEcoregions)
-
-# Clip global bioclim variables to occupied Ecoregions
-CropClim=crop(bioclim_world, occupiedEcoregions) #Crop before mask to speed up processing time
-bioclim_cropped =mask(CropClim, occupiedEcoregions)#clip bioclim to occupied ecoregions, occupiedEcoregions = backgrextent
-
-
-# 3.4
-# download a shapefile from `biomod2` package (code from Guisan et al, 2017).
-# e.g. South Africa
-
-download.file(url = "https://sourceforge.net/projects/biomod2/files/data_for_example/south_of_africa.zip", destfile = "south_of_africa.zip")
-unzip( zipfile = "south_of_africa.zip", 
-       exdir = ".", 
-       overwrite = T)
-list.files("south_of_africa", recursive = T)
-mask_south_of_africa <- shapefile("south_of_africa/South_Africa.shp")
-bioclimVars_cropped <- mask(bioclim_world, 
-                            mask_south_of_africa[ mask_south_of_africa$CNTRY_NAME == "South Africa", ])
-bioclim_cropped <- crop(bioclim_ZA, mask_south_of_africa)
 
 
 ### Step 4: selecting subset of variables to avoid correlated variables
@@ -402,65 +223,6 @@ selected_vars <-c("bio17", "bio1", "bio4")
 clim <-stack(bioclim_cropped$bio1, bioclim_cropped$bio17, bioclim_cropped$bio4)
 plot(clim)
 
-# 4.2
-### MULTICOLLINEARITY CHECK
-
-# VIF = variance inflation factor (I think)
-# step refers to stepwise removal of each variable until the VIF is reduced to <10
-collin<-vifstep(bioclim_cropped, th=10) #selection threshold should be 10;
-vif<-collin@results
-corMatrix<-collin@corMatrix
-
-# write the results to a csv file so that you can check what variables remain and get their VIFs
-write.csv(vif, file='C:\\Users\\Joe\\Documents\\R\\Collinearity_check\\C_picta_VIF_vifstep')
-
-# write the results to a csv file to check correlation coefficients between variables,
-# and then display as a correlation matrix
-write.csv(corMatrix, file="C:\\Users\\Joe\\Documents\\R\\Collinearity_check\\C_picta_CorrelMat_vifstep")
-levelplot(corMatrix)
-# save corMatrix as a png if wanted
-# suggest adding species name to filename if working with several species with differing distributions
-png("BioclimCorrMatrix.png")
-levelplot(corMatrix)
-dev.off()
-
-analogClimExcluded <- exclude(climEcoreg, collin) # exclude collinear variables based on results of vifstep function
-ClimVars <- stack(analogClimExcluded)  # RasterStack format for biomod format
-
-
-# 4.3
-##### Principal Component Analysis.
-#?# needs sorting...
-
-bioclim_ZA_df <- na.omit(as.data.frame(bioclim_ZA))
-head(bioclim_ZA_df)
-pca_ZA <- dudi.pca(bioclim_ZA_df,scannf = F, nf = 2)
-## PCA scores on first two axes
-plot(pca_ZA$li[,1:2])
-## tail of distributions
-sort(pca_ZA$li[,1])[1:10]
-## ids of points to remove
-(to_remove <- which(pca_ZA$li[,1] < -10))
-## remove points and recompute PCA
-if(length(to_remove)){ ## remove outliers
-  bioclim_ZA_df <- bioclim_ZA_df[ - to_remove,]
-  pca_ZA <- dudi.pca(bioclim_ZA_df,scannf = F, nf = 2)  
-}
-par(mfrow=c(1,2))
-## Discriminate Protea laurifolia presences from the entire South African environmental space. 
-s.class(pca_ZA$li[,1:2],
-        fac= factor(rownames(bioclim_ZA_df) %in% ProLau_cell_id, 
-                    levels = c("FALSE", "TRUE" ),
-                    labels = c("backgroud", "ProLau")), 
-        col=c("red","blue"), 
-        csta = 0,
-        cellipse = 2,
-        cpoint = .3,
-        pch = 16)
-s.corcircle(pca_ZA$co, clab = 1)
-# Sub-selection of the variables.
-clim <- stack(subset(bioclim_ZA, c("bio_5", "bio_7", "bio_11", "bio_19")))
-
 
 ### step 5: format data for biomod
 ###################################
@@ -468,7 +230,7 @@ clim <- stack(subset(bioclim_ZA, c("bio_5", "bio_7", "bio_11", "bio_19")))
 myBiomodData <- BIOMOD_FormatingData(resp.var = rep(1, nrow( Occ )),
                                      expl.var = clim,
                                      resp.xy = xy,
-                                     resp.name = "Melampyrum.sylvaticum", # change species name
+                                     resp.name = "Melampyrum.pratense", # change species name
                                      PA.nb.rep = 3,
                                      PA.nb.absences = 500, #this number of PAs is a trade-off with reps, if >1000 PAs only 1 rep is necessary
                                      PA.strategy = 'random',
