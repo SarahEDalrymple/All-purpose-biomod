@@ -2,4 +2,9 @@ To find one highly annotated R script presenting biomod with all the necessary d
 
 Pull requests and revisions/adaptations welcome.
 
+For the biomod2 package, please access the code directly from the CRAN repository:
+Wilfried Thuiller, Damien Georges, Robin Engler and Frank Breiner (2016). biomod2:
+  Ensemble Platform for Species Distribution Modeling. R package version 3.3-7.
+  https://CRAN.R-project.org/package=biomod2
+
 ![](Melsyl_2070_projections.png)
