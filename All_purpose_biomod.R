@@ -716,7 +716,7 @@ ProbDensFunc( initial = ref,
 #Sources:
 
 #R
-citation()
+citation("biomod2")
 
 *Citation:* 
   @book{
