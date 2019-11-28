@@ -15,13 +15,15 @@
 # i.e. steps 1.1 and 1.2 are alternatives, not sequential steps.
 # Script should be adapted for different species, geographic areas and climate projections but,
 # save the script with an appropriate file name and do not change this master version.
-# it is recommended that you delete the parts of the code you do not need to avoid errors
+# it is recommended that you delete the parts of the script you do not need to avoid errors
 
 
 ### Step 0: preparing R for your analysis
 #########################################
 
 #?# not sure which of the following libraries are actually needed in the code that follows
+#?# have hashtagged those that are DEFINITELY needed but can't rule out the others just yet.
+
 # load libraries needed for analysis
 # if not yet installed, R will return an error message in the console,
 # use install.packages() inserting the name of the package in quotation marks in the brackets,
@@ -128,6 +130,13 @@ dev.off()
 
 # 1.2
 # Getting species data from GBIF using *rgbif* package
+
+#?# this section still needs work and ideally needs some protocols that will replicate the manual data cleaning steps
+#?# e.g. limit by uncertainty, resolution, date, type of observation
+#?# it also needs to get around the problem of capped occurrences per download
+#?# metrics on all of the above need to be generated and reported on with error messages returned if download fails or
+#?# other problems (possibly things like resolution or uncertainty limits that remove most of the data)
+#?# this 'step 1.2 protocol' might need to be developed elsewhere and tested with Joe's eagle eye
 
 spp_Protea <- name_suggest(q='Protea laurifolia', rank='species',limit = 10000)
 (spp_Protea <- spp_Protea[ grepl("^Protea laurifolia$", spp_Protea$canonicalName),])
