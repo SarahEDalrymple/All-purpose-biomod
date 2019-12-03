@@ -53,7 +53,7 @@ setwd("C:\\Users\\sarah\\Dropbox\\Melampyrum\\Melampyrum_biomod")
 # or longitudinal coordinates in the first column,
 # and y or latitudinal coordinates in the second column
 
-SpOcc <-read.table("C:\\Users\\sarah\\Dropbox\\Melampyrum\\Melsyl_coordinates.txt", 
+SpOcc <-read.table("C:\\Users\\sarah\\Dropbox\\Melampyrum\\MelPra_coordinates.txt", 
                    header = TRUE)
 
 head(SpOcc) # displays the first five rows of object 'SpOcc'
@@ -79,7 +79,7 @@ plot(Occ)
 
 file.choose()
 global_map <-readOGR("C:\\Users\\sarah\\Dropbox\\GIS_inc_DIVA\\Global map files\\countries.shp")
-distribution <- readOGR("C:\\Users\\sarah\\Dropbox\\Melampyrum\\Mel_syl_distribution.shp")
+
 
 # use the two lines below to check that the shapefiles are on the same projection
 proj4string(global_map)
@@ -102,7 +102,7 @@ points(Occ, pch = 46, col = "blue")
 # the map will go into the working directory but be aware that this will be one level above 
 # the folder in which the modelling outputs are saved.
 # occurrence records are saved as small black dots but these can be changed
-png("Mel_syl_Distribution_map.png")
+png("Mel_pra_Distribution_map.png")
 plot(inspect_dist_points)
 points(Occ, pch = 46, col = "black")
 dev.off()
@@ -241,10 +241,10 @@ myBiomodData <- BIOMOD_FormatingData(resp.var = rep(1, nrow( Occ )),
 myBiomodDataPlot <- plot(myBiomodData)
 
 # save plot as .png
-png("Presence_PA_plots_Melsyl.png")
+png("Presence_PA_plots_Melpra.png")
 myBiomodDataPlot <- plot(myBiomodData)
 dev.off()
-
+myBiomodDataPlot
 ## function to get PA dataset - creates a new function
 #get_PAtab <- function(bfd){dplyr::bind_cols(x = bfd@coord[, 1],
 # y = bfd@coord[, 2],
@@ -284,9 +284,10 @@ myBiomodModelOut_scores <- get_evaluations(myBiomodModelOut)
 scores <- dim(myBiomodModelOut_scores)
 scores <- dimnames(myBiomodModelOut_scores)
 ?dim
+scores
 #?# have attempted to write code below to create a csv file from the scores object
-# don't know if this is the correct thing to do though - 
-write.csv(scores,file=paste("Mel_syl_scores.csv",sep="")) # write csv variable importance doc
+#?# don't know if this is the correct thing to do though - doesn't seem to work
+write.csv(scores,file=paste("Mel_pra_scores.csv",sep="")) # write csv variable importance doc
 
 # produce graphs for assessing the relative performance of models, cross-validation runs and PA sampling
 # run models_scores_graph() if you want to inspect it in the plots window
@@ -296,7 +297,7 @@ write.csv(scores,file=paste("Mel_syl_scores.csv",sep="")) # write csv variable i
 models_scores_graph(myBiomodModelOut, by = "models" , metrics = c("ROC","TSS"), 
                     xlim = c(0.5,1), ylim = c(0.5,1))
 # save as graph
-png("Melampyrum.sylvaticum//myBiomodModelOut_models.png")
+png("Melampyrum.pratense//myBiomodModelOut_models.png")
 models_scores_graph(myBiomodModelOut, by = "models" , metrics = c("ROC","TSS"), 
                     xlim = c(0.5,1), ylim = c(0.5,1))
 dev.off()
@@ -305,7 +306,7 @@ dev.off()
 models_scores_graph(myBiomodModelOut, by = "cv_run" , metrics = c("ROC","TSS"), 
                     xlim = c(0.5,1), ylim = c(0.5,1))
 # save as graph
-png("Melampyrum.sylvaticum//myBiomodModelOut_cv_run.png")
+png("Melampyrum.pratense//myBiomodModelOut_cv_run.png")
 models_scores_graph(myBiomodModelOut, by = "cv_run" , metrics = c("ROC","TSS"), 
                     xlim = c(0.5,1), ylim = c(0.5,1))
 dev.off()
@@ -314,7 +315,7 @@ dev.off()
 models_scores_graph(myBiomodModelOut, by = "data_set" , metrics = c("ROC","TSS"), 
                     xlim = c(0.5,1), ylim = c(0.5,1))
 # save as graph
-png("Melampyrum.sylvaticum//myBiomodModelOut_PA_data_set.png")
+png("Melampyrum.pratense//myBiomodModelOut_PA_data_set.png")
 models_scores_graph(myBiomodModelOut, by = "data_set" , metrics = c("ROC","TSS"), 
                     xlim = c(0.5,1), ylim = c(0.5,1))
 dev.off()
@@ -323,7 +324,7 @@ dev.off()
 ## make the mean of variable importance by algorithm
 varimp <- apply(myBiomodModelOut_var_import, c(1,2), mean)
 varimp
-write.csv(varimp,file=paste("Mel_syl_varimp.csv",sep="")) # write csv variable importance doc
+write.csv(varimp,file=paste("Melampyrum.pratense//Mel_pra_varimp.csv",sep="")) # write csv variable importance doc
 
 #meanVarImport_glm <- BIOMOD_LoadModels(myBiomodModelOut, models='GLM')
 meanVarImport_gbm <- BIOMOD_LoadModels(myBiomodModelOut, models='GBM')
@@ -331,14 +332,14 @@ meanVarImport_rf <- BIOMOD_LoadModels(myBiomodModelOut, models='RF')
 meanVarImport_gam <- BIOMOD_LoadModels(myBiomodModelOut, models='GAM')
 #+ 6, cache=TRUE ,opts.label = "half_page_figure"
 #glm_eval_strip <- biomod2::response.plot2(
-models  = meanVarImport_glm,
-Data = get_formal_data(myBiomodModelOut,'expl.var'), 
-show.variables= get_formal_data(myBiomodModelOut,'expl.var.names'),
-do.bivariate = FALSE,
-fixed.var.metric = 'median',
-legend = FALSE,
-display_title = FALSE,
-data_species = get_formal_data(myBiomodModelOut,'resp.var'))
+#models  = meanVarImport_glm,
+#Data = get_formal_data(myBiomodModelOut,'expl.var'), 
+#show.variables= get_formal_data(myBiomodModelOut,'expl.var.names'),
+#do.bivariate = FALSE,
+#fixed.var.metric = 'median',
+#legend = FALSE,
+#display_title = FALSE,
+#data_species = get_formal_data(myBiomodModelOut,'resp.var'))
 gbm_eval_strip <- biomod2::response.plot2(
   models  = meanVarImport_gbm,
   Data = get_formal_data(myBiomodModelOut,'expl.var'), 
@@ -463,53 +464,6 @@ plot(clim_world_50_CC85)
 clim_world_70_CC85 <-stack(c(bio1 = bioclim_world_70$cc85bi701, bio17 = bioclim_world_70$cc85bi7017, bio4 = bioclim_world_70$cc85bi704))
 plot(clim_world_70_CC85)
 
-# 8.2
-# (equivalent to step 2.2)
-# load 2050 bioclim variables from previously downloaded tifs
-# alter loaded tifs to match those used in current projection,
-# these will be the ones remaning after the VIFs have been used to reduce the 
-clim_world_50_CC85 <- 
-  stack( c( bio5 = "WorldClim_data/2050/BC_45/bc45bi505.tif",
-            bio7 = "WorldClim_data/2050/BC_45/bc45bi507.tif",
-            bio11 = "WorldClim_data/2050/BC_45/bc45bi5011.tif",
-            bio19 = "WorldClim_data/2050/BC_45/bc45bi5019.tif"), RAT = FALSE )
-
-## load 2070 bioclim variables from previously downloaded tifs
-clim_world_70_CC85 <- 
-  stack( c( bio5 = "WorldClim_data/2050/BC_45/bc45bi505.tif",
-            bio7 = "WorldClim_data/2050/BC_45/bc45bi507.tif",
-            bio11 = "WorldClim_data/2050/BC_45/bc45bi5011.tif",
-            bio19 = "WorldClim_data/2050/BC_45/bc45bi5019.tif"), RAT = FALSE )
-#use the script below to check that the rasters are on the same projection
-proj4string(clim)
-proj4string(clim_world_50_CC85 )
-proj4string(clim_world_70_CC85)
-
-# if they're not, use the spTransform() to change the projections to match,
-# in this case, change the base map because 'Occ' is already in the required format for biomod
-global_map <- spTransform(global_map, CRSobj = CRS(proj4string(Occ)))
-
-# 8.3
-# (equivalent to step 2.3)
-#?# need to sort this out...
-
-## GCM -> BCC-CSM1-1, year -> 2050, RCP -> 4.5
-download.file(url = "http://biogeo.ucdavis.edu/data/climate/cmip5/10m/bc45bi50.zip", 
-              destfile = "WorldClim_data/2050_BC_45_bioclim_10min.zip", 
-              method = "auto")
-## GCM -> BCC-CSM1-1, year -> 2070, RCP -> 4.5
-download.file(url = "http://biogeo.ucdavis.edu/data/climate/cmip5/10m/bc45bi70.zip", 
-              destfile = "WorldClim_data/2070_BC_45_bioclim_10min.zip", 
-              method = "auto")
-# extract files
-unzip( zipfile = "WorldClim_data/2050_BC_45_bioclim_10min.zip", 
-       exdir = "WorldClim_data/2050/BC_45",
-       overwrite = T)
-list.files("WorldClim_data/2050/BC_45/")
-unzip( zipfile = "WorldClim_data/2070_BC_45_bioclim_10min.zip",
-       exdir = "WorldClim_data/2070/BC_45",
-       overwrite = T)
-list.files("WorldClim_data/2070/BC_45/")
 
 
 #### step 9: crop future bioclim variables
@@ -532,13 +486,7 @@ clim_70_CC85 <- stack( clim_70_CC85 )
 plot(clim_70_CC85)
 
 
-# 9.2
-# limit area using existing shapefile used to create object 'extshp'
-clim_50_CC85 <- crop(clim_world_50_CC85, extshp)
-clim_50_CC85 <- mask(clim_world_50_CC85, extshp)
 
-clim_70_CC85 <- crop(clim_world_70_CC85, extshp)
-clim_70_CC85 <- mask(clim_world_70_CC85, extshp)
 
 ##make sure these stacks have exactly the same extent as the one used for current projections (clim)
 clim
@@ -550,40 +498,6 @@ alignExtent(extshp, clim, snap = "near")
 alignExtent(extshp, clim_50_CC85 , snap = "near")
 alignExtent(extshp, clim_70_CC85 , snap = "near")
 
-# 9.3
-# crop using occupied ecoregions shapefile
-clim_50_CC85 <- crop(clim_world_50_CC85, occupiedEcoregions)
-clim_50_CC85 <- mask(clim_world_50_CC85, occupiedEcoregions)
-
-clim_70_CC85 <- crop(clim_world_70_CC85, occupiedEcoregions)
-clim_70_CC85 <- mask(clim_world_70_CC85, occupiedEcoregions)
-
-# make sure these stacks have exactly the same extent as the one used for current projections (clim)
-# run code below and properties including extent will be displayed in the console
-clim
-clim_50_CC85
-clim_70_CC85
-
-# if not, use alignExtent() to correct each one
-alignExtent(occupiedEcoregions, clim, snap = "near")
-alignExtent(occupiedEcoregions, clim_50_CC85 , snap = "near")
-alignExtent(occupiedEcoregions, clim_70_CC85 , snap = "near")
-
-# 9.4
-# limit area using shapefile from biomod
-#?# sort this out...
-clim_50_CC85 <- crop( clim_world_50_CC85, mask_south_of_africa)
-clim_50_CC85 <- mask( clim_50_CC85, 
-                      mask_south_of_africa[ mask_south_of_africa$CNTRY_NAME == "South Africa", ] )
-clim_50_CC85 <- stack( clim_50_CC85 )
-## Save this rasterstack on the hard drive if needed. 
-
-## crop to required area
-clim_70_CC85 <- crop( clim_world_2070_CC85, mask_south_of_africa )
-clim_70_CC85 <- mask( clim_70_CC85, 
-                      mask_south_of_africa[ mask_south_of_africa$CNTRY_NAME == "South Africa", ])
-clim_70_CC85 <- stack( clim_70_CC85 )
-## You may save these rasters on the hard drive.
 
 
 #### step 10: future projections
@@ -604,6 +518,11 @@ ensemble_models_proj_2050_CC85 <-
 plot(ensemble_models_proj_2050_CC85, 
      str.grep = "EMca|EMwmean")
 
+png("Melampyrum.pratense//ensemble_models_proj_2050_CC85.png")
+plot(ensemble_models_proj_2050_CC85, 
+     str.grep = "EMca|EMwmean")
+dev.off()
+
 models_proj_2070_CC85 <- BIOMOD_Projection( modeling.output = myBiomodModelOut,
                                             new.env = clim_70_CC85,
                                             proj.name = "2070_CC85",
@@ -619,6 +538,10 @@ ensemble_models_proj_2070_CC85 <-
 plot(ensemble_models_proj_2070_CC85, 
      str.grep = "EMca|EMwmean")
 
+png("Melampyrum.pratense//ensemble_models_proj_2070_CC85.png")
+plot(ensemble_models_proj_2070_CC85, 
+     str.grep = "EMca|EMwmean")
+dev.off()
 
 #### step 11: calculate projected species range change
 ######################################################
@@ -626,14 +549,14 @@ plot(ensemble_models_proj_2070_CC85,
 ## load binary projections
 file.choose()
 bin_proj_current <- stack( 
-  c( ca = "C:/Users/sarah/Dropbox/Melampyrum/Melampyrum_biomod/Melampyrum.sylvaticum/proj_current/individual_projections/Melampyrum.sylvaticum_EMcaByTSS_mergedAlgo_mergedRun_mergedData_TSSbin.img",
-     wm = "C:/Users/sarah/Dropbox/Melampyrum/Melampyrum_biomod/Melampyrum.sylvaticum/proj_current/individual_projections/Melampyrum.sylvaticum_EMwmeanByTSS_mergedAlgo_mergedRun_mergedData_TSSbin.img") )
+  c( ca = "C:/Users/sarah/Dropbox/Melampyrum/Melampyrum_biomod/Melampyrum.pratense/proj_current/individual_projections/Melampyrum.pratense_EMcaByTSS_mergedAlgo_mergedRun_mergedData_TSSbin.img",
+     wm = "C:/Users/sarah/Dropbox/Melampyrum/Melampyrum_biomod/Melampyrum.pratense/proj_current/individual_projections/Melampyrum.pratense_EMwmeanByTSS_mergedAlgo_mergedRun_mergedData_TSSbin.img") )
 bin_proj_2050_CC85 <- stack( 
-  c( ca = "C:/Users/sarah/Dropbox/Melampyrum/Melampyrum_biomod/Melampyrum.sylvaticum/proj_2050_CC85/individual_projections/Melampyrum.sylvaticum_EMcaByTSS_mergedAlgo_mergedRun_mergedData_TSSbin.img",
-     wm = "C:/Users/sarah/Dropbox/Melampyrum/Melampyrum_biomod/Melampyrum.sylvaticum/proj_2050_CC85/individual_projections/Melampyrum.sylvaticum_EMwmeanByTSS_mergedAlgo_mergedRun_mergedData_TSSbin.img") )
+  c( ca = "C:/Users/sarah/Dropbox/Melampyrum/Melampyrum_biomod/Melampyrum.pratense/proj_2050_CC85/individual_projections/Melampyrum.pratense_EMcaByTSS_mergedAlgo_mergedRun_mergedData_TSSbin.img",
+     wm = "C:/Users/sarah/Dropbox/Melampyrum/Melampyrum_biomod/Melampyrum.pratense/proj_2050_CC85/individual_projections/Melampyrum.pratense_EMwmeanByTSS_mergedAlgo_mergedRun_mergedData_TSSbin.img") )
 bin_proj_2070_CC85 <- stack( 
-  c( ca = "C:/Users/sarah/Dropbox/Melampyrum/Melampyrum_biomod/Melampyrum.sylvaticum/proj_2070_CC85/individual_projections/Melampyrum.sylvaticum_EMcaByTSS_mergedAlgo_mergedRun_mergedData_TSSbin.img",
-     wm = "C:/Users/sarah/Dropbox/Melampyrum/Melampyrum_biomod/Melampyrum.sylvaticum/proj_2070_CC85/individual_projections/Melampyrum.sylvaticum_EMwmeanByTSS_mergedAlgo_mergedRun_mergedData_TSSbin.img") )
+  c( ca = "C:/Users/sarah/Dropbox/Melampyrum/Melampyrum_biomod/Melampyrum.pratense/proj_2070_CC85/individual_projections/Melampyrum.pratense_EMcaByTSS_mergedAlgo_mergedRun_mergedData_TSSbin.img",
+     wm = "C:/Users/sarah/Dropbox/Melampyrum/Melampyrum_biomod/Melampyrum.pratense/proj_2070_CC85/individual_projections/Melampyrum.pratense_EMwmeanByTSS_mergedAlgo_mergedRun_mergedData_TSSbin.img") )
 
 ## SRC current -> 2050
 SRC_current_2050_CC85 <- BIOMOD_RangeSize( bin_proj_current,
@@ -647,13 +570,10 @@ SRC_current_2070_CC85$Compt.By.Models
 src_map <- stack(SRC_current_2050_CC85$Diff.By.Pixel, SRC_current_2070_CC85$Diff.By.Pixel)
 names(src_map) <- c("ca cur-2050", "wm cur-2050", "ca cur-2070", "wm cur-2070")
 
+#?# this mask function doesn't seem 
 ## mask by environmental area
-src_map 
-<- mask(src_map, ext)
+#src_map <- mask(src_map, ext)
 
-## mask by environmental area
-src_map <- mask(src_map,
-                mask_south_of_africa[ mask_south_of_africa$CNTRY_NAME == "South Africa", ])
 
 my.at <- seq(-2.5,1.5,1)
 myColorkey <- list(at=my.at, ## where the colors change
@@ -662,9 +582,17 @@ myColorkey <- list(at=my.at, ## where the colors change
                      at=my.at[-1]-0.5 ## where to print labels
                    ))
 rasterVis::levelplot( src_map, 
-                      main = "Melampyrum sylvaticum range change",
+                      main = "Melampyrum pratense range change",
                       colorkey = myColorkey,
                       layout = c(2,2) )
+png("Melampyrum.pratense//Melpra_range_change.png")
+rasterVis::levelplot( src_map, 
+                      main = "Melampyrum pratense range change",
+                      colorkey = myColorkey,
+                      layout = c(2,2) )
+dev.off()
+
+#?# don't know what the following code does (to end)
 ref <- subset(bin_proj_current, "ca")
 ## define the facets we want to study
 mods <- c( "GBM", "RF", "GAM", "caByTSS", "wmeanByTSS")
@@ -676,7 +604,7 @@ groups <- as.matrix( expand.grid( models = mods,
                                   cv_run = cv_run,
                                   stringsAsFactors = FALSE) )
 ## load all projections we have produced
-all_bin_proj_files <- list.files( path = "Melampyrum.sylvaticum",  
+all_bin_proj_files <- list.files( path = "Melampyrum.pratense",  
                                   pattern = "_TSSbin.img$",
                                   full.names = TRUE, 
                                   recursive = TRUE)
@@ -705,12 +633,12 @@ ProbDensFunc( initial = ref,
               groups = t(groups),
               plothist = FALSE,
               cvsn = FALSE,
-              filename = paste("Melampyrum.sylvaticum/ProbDensFuncPlot.png"))
+              filename = paste("Melampyrum.pratense/ProbDensFuncPlot.png"))
 ```
 #### Ouputs generated by above analysis
 # .BIOMOD_DATA = predictions files
 # models = 
-# Melsyl_range_change.png = map of areas of loss, gain, maintained presence and absence by pixel.
+# Melpra_range_change.png = map of areas of loss, gain, maintained presence and absence by pixel.
 #                         In this script, 'ca' and 'wm' are selected, committee averaging
 
 #Sources:
