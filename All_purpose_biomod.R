@@ -95,12 +95,11 @@ plot(Occ)
 
 # plot() above, will plot your datapoints spatially to check they look okay,
 # but this may not mean much without a map to set them against. If you want to use a map,
-# download world map files ('countries.shp') to the working directory
-# from http://www.diva-gis.org/Data and use readOGR() to tell R which shapefile to read
+# download world map files (I can share'countries.shp' with you) to the working directory
+# use readOGR() to tell R which shapefile to read
 
 file.choose()
 global_map <-readOGR("C:\\Users\\sarah\\Dropbox\\GIS_inc_DIVA\\Global map files\\countries.shp")
-distribution <- readOGR("C:\\Users\\sarah\\Dropbox\\Melampyrum\\Mel_syl_distribution.shp")
 
 # use the two lines below to check that the shapefiles are on the same projection
 proj4string(global_map)
@@ -706,6 +705,11 @@ proj4string(bioclim_world_50)
 clim_world_50_CC85 <-stack(c(bio1 = bioclim_world_50$cc85bi501, bio17 = bioclim_world_50$cc85bi5017, bio4 = bioclim_world_50$cc85bi504))
 plot(clim_world_50_CC85)
 
+# save the plots to the working directory
+png("BioclimCorrMatrix.png")
+plot(clim_world_50_CC85)
+dev.off()
+
 # 2070
 clim_world_70_CC85 <-stack(c(bio1 = bioclim_world_70$cc85bi701, bio17 = bioclim_world_70$cc85bi7017, bio4 = bioclim_world_70$cc85bi704))
 plot(clim_world_70_CC85)
@@ -851,6 +855,12 @@ ensemble_models_proj_2050_CC85 <-
 plot(ensemble_models_proj_2050_CC85, 
      str.grep = "EMca|EMwmean")
 
+#?# change code below so that these plots are saved into species specific folders
+png("Melampyrum.pratense//ensemble_models_proj_2050_CC85.png")
+plot(ensemble_models_proj_2050_CC85, 
+     str.grep = "EMca|EMwmean")
+dev.off()
+
 models_proj_2070_CC85 <- BIOMOD_Projection( modeling.output = myBiomodModelOut,
                                             new.env = clim_70_CC85,
                                             proj.name = "2070_CC85",
@@ -865,6 +875,11 @@ ensemble_models_proj_2070_CC85 <-
                               do.stack = FALSE )
 plot(ensemble_models_proj_2070_CC85, 
      str.grep = "EMca|EMwmean")
+
+png("Melampyrum.pratense//ensemble_models_proj_2070_CC85.png")
+plot(ensemble_models_proj_2070_CC85, 
+     str.grep = "EMca|EMwmean")
+dev.off()
 
 
 #### step 11: calculate projected species range change
