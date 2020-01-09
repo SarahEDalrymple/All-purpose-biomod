@@ -28,6 +28,7 @@
 # if not yet installed, R will return an error message in the console,
 # use install.packages() inserting the name of the package in quotation marks in the brackets,
 # and then try loading the libraries again
+install.packages("biomod2")
 
 library(ade4)
 library(sp)#
@@ -50,6 +51,7 @@ library(dplyr)
 library(markdown)
 library(ggmap)
 library(rgbif)#
+??SpatialPointsDataFrame
 
 
 # insert file pathway with setwd() i.e. something like this: setwd("C:\\Users\\Joe\\Documents\\R")
@@ -58,7 +60,7 @@ library(rgbif)#
 
 getwd()
 choose.dir()
-setwd("C:\\Users\\sarah\\Dropbox\\Melampyrum\\Melampyrum_biomod")
+setwd("E:\\Research P\\New folder")
 
 ### step 1: read distribution data
 ##################################
@@ -74,8 +76,8 @@ setwd("C:\\Users\\sarah\\Dropbox\\Melampyrum\\Melampyrum_biomod")
 # or longitudinal coordinates in the first column,
 # and y or latitudinal coordinates in the second column
 
-SpOcc <-read.table("C:\\Users\\sarah\\Dropbox\\Melampyrum\\Melsyl_coordinates.txt", 
-                   header = TRUE)
+SpOcc <-read.table("Beardedvulture.txt", 
+                   header = TRUE,row.names = NULL)
 
 head(SpOcc) # displays the first five rows of object 'SpOcc'
 
@@ -87,12 +89,11 @@ ProjW = "+proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +no_defs"
 #occurences in SpatialPointsDataFrame() format required by function 'over' and biomod2
 # square brackets below specify which rows (before comma) and columns (after comma) refer to 'xy' object
 # if x and y coordinates are in different rows, change these numbers accordingly
-xy <- SpOcc[,1:2]
+xy <- SpOcc[,4:5]
 df <- SpOcc
 Occ <- SpatialPointsDataFrame(coords=xy, data=df, proj4string = CRS(ProjW))
 
 plot(Occ)
-
 # plot() above, will plot your datapoints spatially to check they look okay,
 # but this may not mean much without a map to set them against. If you want to use a map,
 # download world map files (I can share'countries.shp' with you) to the working directory
