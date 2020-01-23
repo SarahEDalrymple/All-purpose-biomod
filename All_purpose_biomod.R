@@ -21,10 +21,14 @@
 ### Step 0: preparing R for your analysis
 #########################################
 
+# following code removes all objects from the environment - good practice to run this at the start of every session
+rm(list=ls()) #Removes all objects from working environment
+
+# load libraries needed for analysis
+
 #?# not sure which of the following libraries are actually needed in the code that follows
 #?# have hashtagged those that are DEFINITELY needed but can't rule out the others just yet.
 
-# load libraries needed for analysis
 # if not yet installed, R will return an error message in the console,
 # use install.packages() inserting the name of the package in quotation marks in the brackets,
 # and then try loading the libraries again
@@ -54,13 +58,27 @@ library(rgbif)#
 ??SpatialPointsDataFrame
 
 
-# insert file pathway with setwd() i.e. something like this: setwd("C:\\Users\\Joe\\Documents\\R")
+# collect provenance information
+
+prov.init(prov.dir="../prov", overwrite=TRUE) #initialize provenance collection
+
+# insert file pathway with setwd() using choose.dir() function or copy in file pathway
+# i.e. something like this: setwd("C:\\Users\\Joe\\Documents\\R")
+
+setwd(choose.dir()) #########
+getwd()
+
+#or
+
+setwd("C:\\Users\\sarah\\Dropbox\\R materials\\Biomod\\biomod2_workshop")
+
 # *IMPORTANT* if working with various species, it's a good idea to set the 
 # working directory to a specific folder for each species
+# use the dir.create() to do this
 
-getwd()
-choose.dir()
-setwd("E:\\Research P\\New folder")
+dir.create("bearded_vulture")
+
+
 
 ### step 1: read distribution data
 ##################################
