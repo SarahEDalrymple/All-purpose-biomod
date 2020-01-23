@@ -57,15 +57,17 @@ library(ggmap)
 library(rgbif)#
 ??SpatialPointsDataFrame
 
-
+################################################################################
 # collect provenance information
 
 prov.init(prov.dir="../prov", overwrite=TRUE) #initialize provenance collection
 
+################################################################################
+
 # insert file pathway with setwd() using choose.dir() function or copy in file pathway
 # i.e. something like this: setwd("C:\\Users\\Joe\\Documents\\R")
 
-setwd(choose.dir()) #########
+setwd(choose.dir())
 getwd()
 
 #or
@@ -77,7 +79,6 @@ setwd("C:\\Users\\sarah\\Dropbox\\R materials\\Biomod\\biomod2_workshop")
 # use the dir.create() to do this
 
 dir.create("bearded_vulture")
-
 
 
 ### step 1: read distribution data
@@ -488,6 +489,20 @@ s.corcircle(pca_ZA$co, clab = 1)
 # Sub-selection of the variables.
 clim <- stack(subset(bioclim_ZA, c("bio_5", "bio_7", "bio_11", "bio_19")))
 
+###############################################################################################
+
+# stop collecting provenance
+prov.quit() #end provenance collection and save
+
+#Get basic information on computing environment
+
+prov.summarize()
+
+#Visualize the provenance graph (DDG)
+
+prov.visualize() # only required to run if need to 
+
+################################################################################################
 
 ### step 5: format data for biomod
 ###################################
